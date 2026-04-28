@@ -348,7 +348,7 @@ const handleGenerateReport = async (customization, formulation, owner, shadowPri
       //   color: textColor,
       // })
 
-      if (ispercentcompute === false) {
+    if (ispercentcompute === false) {
 
       page.drawText((ing.value).toFixed(roundingPrecision).toString() + " kilograms", {
         x: valX,
@@ -512,130 +512,130 @@ const handleGenerateReport = async (customization, formulation, owner, shadowPri
 
     // // ==============================================================================
     // // ADDED IN PRACTICUM
-    // // Add Shadow Prices section (only if available)
-    // // Filter shadow prices the same way as in ShadowPricingTab
-    // const filteredShadowPrices = shadowPrices.filter(
-    //   row => row.constraint !== "Total Ratio" && !row.constraint.includes("Ratio:")
-    // );
+    // Add Shadow Prices section (only if available)
+    // Filter shadow prices the same way as in ShadowPricingTab
+    const filteredShadowPrices = shadowPrices.filter(
+      row => row.constraint !== "Total Ratio" && !row.constraint.includes("Ratio:")
+    );
 
-    // if (filteredShadowPrices.length > 0) {
-    //   // Section separation and page break logic
-    //   const comfortableThreshold = 120;
-    //   if (yPosition < margin + comfortableThreshold) {
-    //     page = pdfDoc.addPage([595.28, 841.89]);
-    //     yPosition = height - margin - 50;
-    //   } else {
-    //     yPosition -= 30; // Gap before Shadow Prices section (if on same page)
-    //   }
+    if (filteredShadowPrices.length > 0) {
+      // Section separation and page break logic
+      const comfortableThreshold = 120;
+      if (yPosition < margin + comfortableThreshold) {
+        page = pdfDoc.addPage([595.28, 841.89]);
+        yPosition = height - margin - 50;
+      } else {
+        yPosition -= 30; // Gap before Shadow Prices section (if on same page)
+      }
 
-    //   // Section header
-    //   page.drawText('Shadow Prices', {
-    //     x: margin,
-    //     y: yPosition,
-    //     size: headerFontSize,
-    //     font: timesRomanBold,
-    //     color: secondaryColor,
-    //   });
+      // Section header
+      page.drawText('Shadow Prices', {
+        x: margin,
+        y: yPosition,
+        size: headerFontSize,
+        font: timesRomanBold,
+        color: secondaryColor,
+      });
 
-    //   yPosition -= 15; // Gap after header
+      yPosition -= 15; // Gap after header
 
-    //   // Word-wrap explanation paragraph using actual PDF width
-    //   const explanationText = "Shadow prices show how much the feed cost would go up or down if you change a nutrient requirement (like protein or calcium) just a little. If the shadow price is high, it means that nutrient is expensive to meet. If it’s low or zero, that nutrient is easy to meet and doesn’t affect the cost much.";
-    //   const availableWidth = width - 2 * margin;
-    //   function pdfWordWrap(text, font, fontSize, maxWidth) {
-    //     const words = text.split(' ');
-    //     let lines = [];
-    //     let currentLine = '';
-    //     for (let word of words) {
-    //       const testLine = currentLine.length > 0 ? currentLine + ' ' + word : word;
-    //       const testLineWidth = font.widthOfTextAtSize(testLine, fontSize);
-    //       if (testLineWidth > maxWidth && currentLine.length > 0) {
-    //         lines.push(currentLine);
-    //         currentLine = word;
-    //       } else {
-    //         currentLine = testLine;
-    //       }
-    //     }
-    //     if (currentLine.length > 0) lines.push(currentLine);
-    //     return lines;
-    //   }
-    //   const explanationLines = pdfWordWrap(explanationText, timesRomanFont, bodyFontSize, availableWidth);
+      // Word-wrap explanation paragraph using actual PDF width
+      const explanationText = "Shadow prices show how much the feed cost would go up or down if you change a nutrient requirement (like protein or calcium) just a little. If the shadow price is high, it means that nutrient is expensive to meet. If it’s low or zero, that nutrient is easy to meet and doesn’t affect the cost much.";
+      const availableWidth = width - 2 * margin;
+      function pdfWordWrap(text, font, fontSize, maxWidth) {
+        const words = text.split(' ');
+        let lines = [];
+        let currentLine = '';
+        for (let word of words) {
+          const testLine = currentLine.length > 0 ? currentLine + ' ' + word : word;
+          const testLineWidth = font.widthOfTextAtSize(testLine, fontSize);
+          if (testLineWidth > maxWidth && currentLine.length > 0) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine.length > 0) lines.push(currentLine);
+        return lines;
+      }
+      const explanationLines = pdfWordWrap(explanationText, timesRomanFont, bodyFontSize, availableWidth);
 
-    //   // Estimate the height needed for the header + paragraph only
-    //   const estimatedHeaderParaHeight =
-    //     15 + // header
-    //     explanationLines.length * (lineHeight - 2) + // paragraph
-    //     6; // gap after paragraph
-    //   if (yPosition < margin + estimatedHeaderParaHeight) {
-    //     page = pdfDoc.addPage([595.28, 841.89]);
-    //     yPosition = height - margin - 50;
-    //   }
+      // Estimate the height needed for the header + paragraph only
+      const estimatedHeaderParaHeight =
+        15 + // header
+        explanationLines.length * (lineHeight - 2) + // paragraph
+        6; // gap after paragraph
+      if (yPosition < margin + estimatedHeaderParaHeight) {
+        page = pdfDoc.addPage([595.28, 841.89]);
+        yPosition = height - margin - 50;
+      }
 
-    //   explanationLines.forEach(line => {
-    //     page.drawText(line, {
-    //       x: margin,
-    //       y: yPosition,
-    //       size: bodyFontSize,
-    //       font: timesRomanFont,
-    //       color: textColor,
-    //     });
-    //     yPosition -= (lineHeight - 2); // Tighter line spacing
-    //   });
+      explanationLines.forEach(line => {
+        page.drawText(line, {
+          x: margin,
+          y: yPosition,
+          size: bodyFontSize,
+          font: timesRomanFont,
+          color: textColor,
+        });
+        yPosition -= (lineHeight - 2); // Tighter line spacing
+      });
 
-    //   yPosition -= 6; // Gap after explanation
+      yPosition -= 6; // Gap after explanation
 
-    //   // Table headers
-    //   page.drawText('Constraint', {
-    //     x: nameX,
-    //     y: yPosition,
-    //     size: subheaderFontSize,
-    //     font: timesRomanBold,
-    //     color: secondaryColor,
-    //   });
-    //   page.drawText('Shadow Price', {
-    //     x: valX,
-    //     y: yPosition,
-    //     size: subheaderFontSize,
-    //     font: timesRomanBold,
-    //     color: secondaryColor,
-    //   });
-    //   yPosition -= 13;
-    //   // Draw a line under headers
-    //   page.drawLine({
-    //     start: { x: margin, y: yPosition + 5 },
-    //     end: {
-    //       x: margin + nameColWidth + minColWidth + maxColWidth + valColWidth,
-    //       y: yPosition + 5,
-    //     },
-    //     thickness: 0.5,
-    //     color: lightGray,
-    //   });
-    //   yPosition -= 5;
-    //   // Table rows
-    //   filteredShadowPrices.forEach((row) => {
-    //     page.drawText(row.constraint, {
-    //       x: nameX,
-    //       y: yPosition,
-    //       size: bodyFontSize,
-    //       font: timesRomanFont,
-    //       color: textColor,
-    //     });
-    //     page.drawText(row.shadowPrice.toFixed(roundingPrecision).toString(), {
-    //       x: valX,
-    //       y: yPosition,
-    //       size: bodyFontSize,
-    //       font: timesRomanFont,
-    //       color: textColor,
-    //     });
-    //     yPosition -= lineHeight;
-    //     // Check if we need a new page
-    //     if (yPosition < margin + 100) {
-    //       page = pdfDoc.addPage([595.28, 841.89]);
-    //       yPosition = height - margin - 50;
-    //     }
-    //   });
-    //   yPosition -= 5; // Gap after table
-    // }
+      // Table headers
+      page.drawText('Constraint', {
+        x: nameX,
+        y: yPosition,
+        size: subheaderFontSize,
+        font: timesRomanBold,
+        color: secondaryColor,
+      });
+      page.drawText('Shadow Price', {
+        x: valX,
+        y: yPosition,
+        size: subheaderFontSize,
+        font: timesRomanBold,
+        color: secondaryColor,
+      });
+      yPosition -= 13;
+      // Draw a line under headers
+      page.drawLine({
+        start: { x: margin, y: yPosition + 5 },
+        end: {
+          x: margin + nameColWidth + minColWidth + maxColWidth + valColWidth,
+          y: yPosition + 5,
+        },
+        thickness: 0.5,
+        color: lightGray,
+      });
+      yPosition -= 5;
+      // Table rows
+      filteredShadowPrices.forEach((row) => {
+        page.drawText(row.constraint, {
+          x: nameX,
+          y: yPosition,
+          size: bodyFontSize,
+          font: timesRomanFont,
+          color: textColor,
+        });
+        page.drawText(row.shadowPrice.toFixed(roundingPrecision).toString(), {
+          x: valX,
+          y: yPosition,
+          size: bodyFontSize,
+          font: timesRomanFont,
+          color: textColor,
+        });
+        yPosition -= lineHeight;
+        // Check if we need a new page
+        if (yPosition < margin + 100) {
+          page = pdfDoc.addPage([595.28, 841.89]);
+          yPosition = height - margin - 50;
+        }
+      });
+      yPosition -= 5; // Gap after table
+    }
 
     // ==============================================================================
 

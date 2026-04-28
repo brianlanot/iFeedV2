@@ -1319,7 +1319,7 @@ function ViewGroupFormulation({
         shadowPrices={shadowPrices}
         isCustomizationModalOpen={isCustomizationModalOpen}
         setIsCustomizationModalOpen={setIsCustomizationModalOpen}
-        ispercentcompute = {ispercentcompute}
+        ispercentcompute={constraintMode === 'percent'}
       />
       <IngredientSubstituteModal isOpen={isSubModalOpen} onClose={() => setIsSubModalOpen(false)} modalData={modalData} substitutesLoading={substitutesLoading} />
       <InfeasibilityModal isOpen={infeasibilityModal.isOpen} onClose={() => setInfeasibilityModal((prev) => ({ ...prev, isOpen: false }))} diagnosisData={infeasibilityModal.data} />

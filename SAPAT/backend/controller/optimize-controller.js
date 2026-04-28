@@ -1034,57 +1034,62 @@ const formatInput = async (data) => {
  
   // === NUTRIENT RATIO CONSTRAINTS ===
   for (const ratio of nutrientRatioConstraints) {
-    const firstNutrientId = ratio.firstIngredientId || ratio.firstIngredient;
-    const secondNutrientId = ratio.secondIngredientId || ratio.secondIngredient;
     const firstNutrientName = ratio.firstIngredient;
     const secondNutrientName = ratio.secondIngredient;
     const { operator, firstIngredientRatio, secondIngredientRatio } = ratio;
-    
-    if (!firstNutrientId || !secondNutrientId || !operator || !firstIngredientRatio || !secondIngredientRatio) continue;
-    
+
+    if (!firstNutrientName || !secondNutrientName || !operator || !firstIngredientRatio || !secondIngredientRatio) continue;
+
+    // ✅ Resolve actual ObjectIds from the nutrients array in the request
+    const firstNutrientId = nutrients.find(n => n.name === firstNutrientName)?.nutrient_id;
+    const secondNutrientId = nutrients.find(n => n.name === secondNutrientName)?.nutrient_id;
+
+    if (!firstNutrientId || !secondNutrientId) {
+      console.warn(`[Ratio] Could not resolve nutrient IDs for ${firstNutrientName}/${secondNutrientName}`);
+      continue;
+    }
+
     const ratioValue = firstIngredientRatio / secondIngredientRatio;
- 
+
     const vars = ingredients.map(ingredient => {
       const ingData = ingredientsData.find(item => item.name === ingredient.name);
       let n1 = 0, n2 = 0;
- 
+
       if (ingData && Array.isArray(ingData.nutrients)) {
         const dmEntry = ingData.nutrients.find(n => n.nutrient?.toString() === dmNutrientId?.toString());
         const dmDecimal = dmEntry?.value || 1.0;
- 
-        const isFirst = (ingData._id?.toString() === firstNutrientId) || (ingData.name === firstNutrientName);
-        const isSecond = (ingData._id?.toString() === secondNutrientId) || (ingData.name === secondNutrientName);
- 
-        n1 = isFirst ? dmDecimal : 0;
-        n2 = isSecond ? dmDecimal : 0;
+
+        const firstEntry = ingData.nutrients.find(n => n.nutrient?.toString() === firstNutrientId.toString());
+        const secondEntry = ingData.nutrients.find(n => n.nutrient?.toString() === secondNutrientId.toString());
+
+        const scalingFactor = isPercentMode ? (dmTarget / 100) : dmDecimal;
+
+        n1 = (firstEntry?.value || 0) * scalingFactor;
+        n2 = (secondEntry?.value || 0) * scalingFactor;
       }
- 
+
       return {
         name: ingredient.name,
         coef: n1 - (ratioValue * n2)
       };
     });
- 
-    console.log(`[Nutrient Ratio Constraint] ${firstNutrientName || firstNutrientId} / ${secondNutrientName || secondNutrientId} ${operator} ${ratioValue}`);
-    
+
+    console.log(`[Ratio] ${firstNutrientName}/${secondNutrientName} ${operator} ${ratioValue}`);
+    console.log(`[Ratio] vars:`, vars.map(v => `${v.name}: ${v.coef.toFixed(4)}`));
+
     if (vars.every(v => v.coef === 0)) {
-      console.warn(`[Nutrient Ratio Constraint] Skipping because all coefficients are zero.`);
+      console.warn(`[Ratio] Skipping — all coefs zero. Check nutrient IDs match ingredient subdocs.`);
       continue;
     }
- 
+
     let bnds;
-    if (operator === "=") {
-      bnds = { type: "GLP_FX", lb: 0, ub: 0 };
-    } else if (operator === ">=") {
-      bnds = { type: "GLP_LO", lb: 0, ub: null };
-    } else if (operator === "<=") {
-      bnds = { type: "GLP_UP", lb: null, ub: 0 };
-    } else {
-      continue;
-    }
- 
+    if (operator === "=")        bnds = { type: "GLP_FX", lb: 0, ub: 0 };
+    else if (operator === ">=")  bnds = { type: "GLP_LO", lb: 0, ub: null };
+    else if (operator === "<=")  bnds = { type: "GLP_UP", lb: null, ub: 0 };
+    else continue;
+
     constraints.push({
-      name: `Ratio: ${firstNutrientName || firstNutrientId}/${secondNutrientName || secondNutrientId} ${operator} ${ratioValue}`,
+      name: `Ratio: ${firstNutrientName}/${secondNutrientName} ${operator} ${ratioValue}`,
       vars,
       bnds
     });

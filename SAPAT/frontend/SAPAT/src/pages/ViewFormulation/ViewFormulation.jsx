@@ -2129,7 +2129,7 @@ function ViewFormulation({
             </div>
 
             {/* Nutrient Ratio Constraints Table */}
-            {/* {constraintMode !== 'percent' && (
+             {constraintMode !== 'percent' && (
             
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white mt-4">
               <div className="p-4 flex items-center justify-between">
@@ -2165,7 +2165,7 @@ function ViewFormulation({
                 </table>
               </div>
             </div>
-            )} */}
+            )} 
             
             </>
             )}
