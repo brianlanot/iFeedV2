@@ -59,7 +59,6 @@ const createFormulation = async (req, res) => {
 
 const getCowFormulation = async (req, res) => {
     const weight = Number(req.query.weight);
-    console.log("Weight received:", weight);
     try {
         const cowFormulation = await Cow.findOne({ weight }).populate('nutrientrequirement.nutrientid');
         if (!cowFormulation) {
@@ -77,7 +76,6 @@ const getCarabaoFormulation = async (req, res) => {
     const adg = Number(req.query.adg);
     const lactating = req.query.lactating === 'true' ? true : false; // Convert lactating to boolean
     try {
-        console.log("Carabao formulation found:");
         let carabaoFormulation = null;
 
         if (lactating){
@@ -985,7 +983,6 @@ const upsertGroupFormulation = async (formulation) => {
   // 2. Filter out the nulls/empties and join with a clean separator
   const groupName = nameParts.filter(Boolean).join(' | ');
   let group = await GroupFormulation.findOne({ name: groupName });
-  console.log("COLLABORATORS HERE is there: ", formulation.collaborators)
   const formulationDetail = {
     code: formulation.code,
     name: formulation.name,
@@ -1006,7 +1003,6 @@ const upsertGroupFormulation = async (formulation) => {
     collaborators: formulation.collaborators || [],
     avgGain: formulation.avgGain || ''
   };
-  console.log("FORMULATION DETAIL: ", formulationDetail)
   if (group) {
     // Add formulation ID if not exists
     if (!group.formulations.some(id => id.toString() === formulation._id.toString())) {
@@ -1164,7 +1160,6 @@ const upsertGroupFormulationForUpdate = async (formulation) => {
 };
 const getGroupFormulationById = async (req, res) => {
   const { id } = req.params;
-    console.log("NAKUHA MO")
   try {
     const groupFormulation = await GroupFormulation.findById(id)
       .populate('formulations') // populate formulations if you want full data
@@ -1177,7 +1172,6 @@ const getGroupFormulationById = async (req, res) => {
     res.status(200).json({ message: 'success', groupFormulation });
   } catch (err) {
     console.error(err);
-    console.log("ERROR KA")
     res.status(500).json({ message: 'error', error: err.message });
   }
 };
@@ -1188,7 +1182,6 @@ const getGroupFormulationFormulations = async (req, res) => {
   try {
     // 1. Fetch the group formulation
     const group = await GroupFormulation.findById(groupFormulationId);
-    console.log("USER ID: ", userId)
     if (!group) {
       return res.status(404).json({ message: 'GroupFormulation not found' });
     }
@@ -1201,7 +1194,6 @@ const getGroupFormulationFormulations = async (req, res) => {
       const hasAccess = (form.collaborators || []).some(c => c.userId.toString() === userId);
       return isOwner || hasAccess;
     });
-    console.log("Accessible here: ", accessibleFormulations)
     // 3. Map to only name and description
     const result = accessibleFormulations.map(f => ({
       id: f._id,

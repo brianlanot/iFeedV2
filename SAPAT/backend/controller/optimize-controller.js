@@ -118,7 +118,6 @@ const suggestByGroupEnhanced = (
     }
   }
 
-  console.log(`[suggestByGroupEnhanced] percentScale: ${percentScale}`);
 
   // ✅ Build nutrientName -> nutrient_id map by scanning all ingredients
   // Strategy: for each nutrient gap, find the nutrient_id by checking which ObjectId
@@ -152,7 +151,6 @@ const buildNutrientIdMap = () => {
 };
 
   const nutrientIdMap = buildNutrientIdMap();
-  console.log('[suggestByGroupEnhanced] nutrientIdMap:', nutrientIdMap);
 
   const suggestions = [];
 
@@ -195,7 +193,6 @@ const buildNutrientIdMap = () => {
                   const diff = Math.abs((n.value || 0) - dmDecimalExpected);
                   if (diff < bestDiff) { bestDiff = diff; bestId = n.nutrient?.toString(); }
                 });
-                console.log(`  [dmNutrientId] expected=${dmDecimalExpected.toFixed(4)}, bestDiff=${bestDiff.toFixed(4)}, id=${bestId}`);
                 return bestDiff < 0.15 ? bestId : null;
               }
             }
@@ -227,9 +224,6 @@ const buildNutrientIdMap = () => {
         };
       });
 
-
-    console.log(`  Unselected candidates: ${allCandidates.length}`);
-    console.log(`  Sample:`, allCandidates.slice(0, 4).map(c => `${c.name}: ${c.nutrientPercentage}%`));
     
     // After building allCandidates:
 console.log("=== SUGGESTION DEBUG ===");
@@ -525,7 +519,6 @@ const diagnoseNutrientShortages = (
 ) => {
   const gaps = [];
   const isPercentMode = type === 'percent';
-  console.log('[diagnoseNutrientShortages] nutrientsRequest:', JSON.stringify(nutrientsRequest?.slice(0,2)));
 
   const nutrientConstraints = constraints.filter(c =>
     !c.name.includes("Group:") &&
@@ -861,8 +854,6 @@ const formatInput = async (data) => {
         }
       };
     });
-  console.log(`MODE: ${isPercentMode ? 'PERCENT' : 'GRAM'}`);
-  console.log(`DM Target (lb): ${dmTarget}`);
   constraints
     .filter(c => c.name.toLowerCase().includes('dry matter') || c.name.toLowerCase() === 'dm')
     .forEach(c => {
@@ -1216,6 +1207,7 @@ const simplex = async (req, res) => {
     const constraintsMap = {};
     const subjects = [];
     
+    
     // In simplex(), replace the subjects-building loop:
     for (let i = 0; i < constraints.length; i++) {
       const constraintCode = 'c' + i;
@@ -1229,6 +1221,11 @@ const simplex = async (req, res) => {
       subjects[i].bnds.type = glpk[subjects[i].bnds.type];
     }
 
+    const constraintBndTypes = {};
+for (let i = 0; i < constraints.length; i++) {
+  constraintBndTypes['c' + i] = constraints[i].bnds.type; // still a string here
+}
+
     const varsSubjects = [];
     for (let i = 0; i < variableBounds.length; i++) {
       varsSubjects.push({
@@ -1239,9 +1236,6 @@ const simplex = async (req, res) => {
       });
     }
 
-    console.log("=== PRE-SOLVE FEASIBILITY CHECK ===");
-    console.log(`Mode: ${isPercentMode ? 'PERCENT' : 'GRAM'}`);
-    console.log(`DM Target: ${dmTarget}g`);
     
     const output = glpk.solve({
       name: 'LP',
@@ -1271,7 +1265,6 @@ const simplex = async (req, res) => {
         totalSolved += value;
       });
 
-      console.log(`Total solved: ${totalSolved.toFixed(2)}`);
 
       // === COMPUTE TOTAL AS-FED WEIGHT IN GRAMS (both modes) ===
       let totalWeightGrams = 0;
@@ -1327,10 +1320,37 @@ const simplex = async (req, res) => {
         }
       });
 
-      const shadowPrices = Object.entries(output.result.dual).map(([key, value]) => ({
-        constraint: constraintsMap[key] || key,
-        shadowPrice: value
-      }));
+const shadowPrices = Object.entries(output.result.dual).map(([key, value]) => {
+  const constraintName = constraintsMap[key] || key;
+  const constraintDef = constraints.find(c => c.name === constraintName);
+
+  // In GLPK minimization:
+  // - binding lower bound → raw dual is NEGATIVE (relaxing lb = cost goes down)
+  // - binding upper bound → raw dual is POSITIVE
+  // Convention for display: show as positive = "cost increases if requirement tightened"
+  // So we negate to flip the sign for lower bounds.
+  // We detect lower bounds by checking if lb > 0 directly — more reliable than type string.
+  const lb = constraintDef?.bnds?.lb;
+  const ub = constraintDef?.bnds?.ub;
+  const hasLowerBound = lb !== undefined && lb !== null && Number(lb) > 0;
+  const hasUpperBoundOnly = (!hasLowerBound) && ub !== undefined && ub !== null;
+
+  // Just use the raw dual value — GLPK already gives correct sign for display
+  // Negative raw dual on a lower bound = that constraint is costing you money
+  // Take absolute value and show as positive
+  const shadowPrice = Math.abs(value);
+
+  return {
+    constraint: constraintName,
+    shadowPrice: Number(shadowPrice.toFixed(4)),
+  };
+}).filter(sp => {
+  const name = sp.constraint;
+  return !name.includes('Group:') &&
+         !name.includes('Total Mixture') &&
+         !name.includes('Ratio:') &&
+         Math.abs(sp.shadowPrice) > 0.0001;
+});
 
       res.status(200).json({
         status: 'Optimal solution found',
@@ -1383,8 +1403,6 @@ const smartIngredientSuggestions = suggestByGroupEnhanced(
         suggestion = "Reduce forage minimum or relax group constraints.";
       }
 
-      console.log('nutrientGaps:', nutrientGaps);
-      console.log('structuralGaps:', structuralGaps);
 
       res.status(400).json({
         status: 'No optimal solution',
