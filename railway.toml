@@ -1,4 +1,6 @@
 [build]
 builder = "nixpacks"
 buildCommand = "cd SAPAT/backend && npm install"
+
+[deploy]
 startCommand = "cd SAPAT/backend && npm start"
