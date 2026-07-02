@@ -158,11 +158,51 @@ app.get('/auth/google/callback',
 );
 
 
-handleRoutes(app);
-io.on("connection", handleSocket);
+// ─── Health check ────────────────────────────────────────────────────────────
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
+// ─── Routes ──────────────────────────────────────────────────────────────────
+try {
+  handleRoutes(app);
+  console.log('✅ Routes initialized successfully');
+} catch (err) {
+  console.error('❌ Error during route initialization:', err.stack || err);
+}
+
+// ─── Socket.io ───────────────────────────────────────────────────────────────
+try {
+  io.on('connection', handleSocket);
+  console.log('✅ Socket.io connection handler registered');
+} catch (err) {
+  console.error('❌ Error registering Socket.io connection handler:', err.stack || err);
+}
+
+io.on('error', (err) => {
+  console.error('❌ Socket.io server error:', err.stack || err);
+});
+
+// ─── HTTP server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 
-httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running on port ${PORT}`);
+httpServer.on('error', (err) => {
+  console.error('❌ HTTP server error:', err.stack || err);
+});
+
+try {
+  httpServer.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Server is running on port ${PORT}`);
+  });
+} catch (err) {
+  console.error('❌ Failed to start HTTP server:', err.stack || err);
+}
+
+// ─── Process-level safety nets ───────────────────────────────────────────────
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception — server will keep running:', err.stack || err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Promise Rejection at:', promise, '— reason:', reason);
 });
