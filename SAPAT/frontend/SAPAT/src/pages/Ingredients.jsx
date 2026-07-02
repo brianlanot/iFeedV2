@@ -67,7 +67,7 @@ function Ingredients() {
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/search/${user._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/search/${user?._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
       setIngredients(fetchedData.fetched)
@@ -110,7 +110,7 @@ function Ingredients() {
       console.log("selectedIngredient", selectedIngredient)
       const selectedId = selectedIngredient.ingredient_id || selectedIngredient._id
       const res = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/ingredient/${selectedId}/${user._id}`
+        `${import.meta.env.VITE_API_URL}/ingredient/${selectedId}/${user?._id}`
       )
       const messageData = res.data.message
       if (messageData === 'success') {
@@ -181,7 +181,7 @@ function Ingredients() {
     };
       setIsLoading(true)
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/ingredient/import/${user._id}`,
+        `${import.meta.env.VITE_API_URL}/ingredient/import/${user?._id}`,
         payload
       )
       // refetch ingredients to display updated table
@@ -324,14 +324,14 @@ function Ingredients() {
       {/* Modals */}
       <AddIngredientModal
         ingredients={ingredients}
-        user_id={user._id}
+        user_id={user?._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onResult={handleCreateResult}
       />
       <EditIngredientModal
         ingredients={ingredients}
-        user_id={user._id}
+        user_id={user?._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         ingredient={selectedIngredient}

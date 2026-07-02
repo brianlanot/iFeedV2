@@ -43,7 +43,7 @@ const handleGenerateReport = async (customization, formulation, owner, shadowPri
 
     switch (ingredientSorting) {
       case 'alphabetical':
-        sortedIngredients.sort((a, b) => a.name.localeCompare(b.name))
+        sortedIngredients.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
         break
       case 'valueHighToLow':
         sortedIngredients.sort((a, b) => b.value - a.value)
@@ -59,7 +59,7 @@ const handleGenerateReport = async (customization, formulation, owner, shadowPri
         break
       default:
         // Default to alphabetical
-        sortedIngredients.sort((a, b) => a.name.localeCompare(b.name))
+        sortedIngredients.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
     }
 
     console.log("Ingredients before filter:", sortedIngredients)

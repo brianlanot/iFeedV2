@@ -151,7 +151,7 @@ const OptimizationResultsBox = ({
                     </td>
                     {formulation.nutrients.find(nut => nut.name === "Dry Matter") && (
                       <td className="text-gray-500 font-mono border-b">
-                        {formatNum(getIngredientContribution(ingredientId, ing.value, formulation.nutrients.find(n => n.name === "Dry Matter").nutrient_id || formulation.nutrients.find(n => n.name === "Dry Matter")._id, "kilograms"), 2)}kg
+                        {formatNum(getIngredientContribution(ingredientId, ing.value, formulation.nutrients.find(n => n.name === "Dry Matter")?.nutrient_id || formulation.nutrients.find(n => n.name === "Dry Matter")?._id, "kilograms"), 2)}kg
                       </td>
                     )}
                     {formulation.nutrients.map((nut) => (
@@ -177,7 +177,7 @@ const OptimizationResultsBox = ({
                 </td>
                 {formulation.nutrients.find(nut => nut.name === "Dry Matter") && (
                   <td className="font-mono border-t border-amber-100">
-                    {formatNum(calculateTotalAchievedForNutrient(formulation.nutrients.find(n => n.name === "Dry Matter").nutrient_id || formulation.nutrients.find(n => n.name === "Dry Matter")._id, "kilograms"), 2)}kg
+                    {formatNum(calculateTotalAchievedForNutrient(formulation.nutrients.find(n => n.name === "Dry Matter")?.nutrient_id || formulation.nutrients.find(n => n.name === "Dry Matter")?._id, "kilograms"), 2)}kg
                   </td>
                 )}
                 {formulation.nutrients.map((nut, i) => (

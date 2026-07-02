@@ -63,7 +63,7 @@ function Formulations() {
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/formulation/filtered/search/${user._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/formulation/filtered/search/${user?._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
       setFormulations(fetchedData.fetched)
@@ -416,23 +416,23 @@ function Formulations() {
       {/* Modals */}
       <CreateFormulationModal
         formulations={formulations}
-        ownerId={user._id}
-        ownerName={user.displayName}
+        ownerId={user?._id}
+        ownerName={user?.displayName}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onResult={handleCreateResult}
-        userType={user.userType} 
+        userType={user?.userType} 
       />
 
       
       <GroupFormulationModal
         formulations={formulations}
-        ownerId={user._id}
-        ownerName={user.displayName}
+        ownerId={user?._id}
+        ownerName={user?.displayName}
         isOpen={groupFormulation}
         onClose={() => setGroupFormulation(false)}
         onResult={handleCreateResult}
-        userType={user.userType}
+        userType={user?.userType}
       />
 
       {/* For Editing */}

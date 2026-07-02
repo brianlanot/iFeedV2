@@ -576,7 +576,7 @@ function ViewFormulation({
       await axios.put(
         `${VITE_API_URL}/formulation/collaborator/${id}`,
         {
-          updaterId: user._id,
+          updaterId: user?._id,
           collaboratorId: newCollaborator.newId,
           access: newCollaborator.newAccess,
           displayName: newCollaborator.newDisplayName,
@@ -1328,7 +1328,7 @@ function ViewFormulation({
     {/* Avatars */}
     <div className="flex space-x-2 shrink-0">
       {others.map(({ connectionId, info }) => (
-        <Avatar key={connectionId} src={info.avatar} name={info.name} />
+        <Avatar key={connectionId} src={info?.avatar} name={info?.name} />
       ))}
       <Avatar src={self.info.avatar} name={t('You')} />
     </div>
@@ -2234,7 +2234,7 @@ function ViewFormulation({
         onAdd={goToConfirmationModal}
         onEdit={handleUpdateCollaborator}
         onDelete={handleDeleteCollaborator}
-        userId={user._id}
+        userId={user?._id}
         formulation={formulation}
         collaborators={collaborators}
       />

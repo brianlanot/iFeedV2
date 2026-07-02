@@ -304,7 +304,7 @@ const OptimizationResultsModal = ({
                             {formatNum(getIngredientContribution(
                               ingredientData?._id, 
                               ing.value, 
-                              formulation.nutrients.find(n => n.name === "Dry Matter").nutrient_id || formulation.nutrients.find(n => n.name === "Dry Matter")._id, 
+                              formulation.nutrients.find(n => n.name === "Dry Matter")?.nutrient_id || formulation.nutrients.find(n => n.name === "Dry Matter")?._id, 
                               ingredientData,
                               "kilograms",
                               results.totalWeight

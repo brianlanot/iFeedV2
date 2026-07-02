@@ -166,7 +166,7 @@ const fetchFormulationData = async () => {
   try {
     const response = await axios.get(`${VITE_API_URL}/groupformulations/${id}`)
     const formulations = await axios.get(
-          `${VITE_API_URL}/groupformulations/${id}/user/${user._id}/formulations`
+          `${VITE_API_URL}/groupformulations/${id}/user/${user?._id}/formulations`
         );
 
     setFormulations(formulations.data.formulations);
@@ -210,7 +210,7 @@ const fetchFormulationData = async () => {
     }
 
     // set owner id
-    const owner = user._id
+    const owner = user?._id
     console.log("USER ID HERE:", user)
     setOwnerId(owner)
     setIsLoading(false)

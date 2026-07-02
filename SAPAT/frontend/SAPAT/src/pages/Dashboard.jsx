@@ -44,7 +44,7 @@ function Dashboard() {
           variants={itemVariants}
           className="text-deepbrown text-3xl md:text-4xl font-extrabold tracking-tighter"
         >
-          {t('Hello')}, {user.displayName}! 👋
+          {t('Hello')}, {user?.displayName}! 👋
         </motion.h1>
       </section>
 

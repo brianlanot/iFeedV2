@@ -719,7 +719,7 @@ function ViewGroupFormulation({
                       <div className="flex items-center justify-between sm:justify-end gap-3 pb-2 sm:pb-0 border-b border-gray-50 sm:border-none">
                         <div className="flex space-x-2 shrink-0">
                           {others.map(({ connectionId, info }) => (
-                            <Avatar key={connectionId} src={info.avatar} name={info.name} />
+                            <Avatar key={connectionId} src={info?.avatar} name={info?.name} />
                           ))}
                           <Avatar src={self.info.avatar} name={t('You')} />
                         </div>

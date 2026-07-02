@@ -263,7 +263,7 @@ function ViewFormulationEntry({ id }) {
   const checkAccess = async () => {
     try {
       const res = await axios.get(
-        `${VITE_API_URL}/formulation/collaborator/${id}/${user._id}`
+        `${VITE_API_URL}/formulation/collaborator/${id}/${user?._id}`
       )
       if (res.data.access === 'notFound') {
         setShouldRedirect(true)

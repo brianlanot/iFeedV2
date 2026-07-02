@@ -51,7 +51,7 @@ function Nutrients() {
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/nutrient/filtered/search/${user._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/search/${user?._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
       setNutrients(fetchedData.fetched)
@@ -92,7 +92,7 @@ function Nutrients() {
     try {
       const selectedId = selectedNutrient.nutrient_id || selectedNutrient._id
       const res = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/nutrient/${selectedId}/${user._id}`
+        `${import.meta.env.VITE_API_URL}/nutrient/${selectedId}/${user?._id}`
       )
       const messageData = res.data.message
       if (messageData === 'success') {
@@ -252,14 +252,14 @@ function Nutrients() {
       {/* Modals */}
       <AddNutrientModal
         nutrients={nutrients}
-        user_id={user._id}
+        user_id={user?._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onResult={handleCreateResult}
       />
       <EditNutrientModal
         nutrients={nutrients}
-        user_id={user._id}
+        user_id={user?._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         nutrient={selectedNutrient}
