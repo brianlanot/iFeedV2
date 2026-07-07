@@ -1259,6 +1259,7 @@ for (let i = 0; i < constraints.length; i++) {
     let isSuccessful = (output.result.status === glpk.GLP_OPT);
 
     if (configuration === "soft") isSuccessful = true;
+    console.log("[soft mode] isSuccessful:", isSuccessful, configuration);
     // ========================= POST-SOLVE ANALYSIS =========================
     if (isSuccessful) {
       console.log("✅ Optimal solution found!");
