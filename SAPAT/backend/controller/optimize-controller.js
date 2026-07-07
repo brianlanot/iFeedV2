@@ -764,7 +764,7 @@ if (constraint.bnds.ub !== undefined && constraint.bnds.ub > 0) {
 };
 
 const formatInput = async (data) => {
-  const { userId, ingredients, nutrients, weight, type, nutrientRatioConstraints = [] } = data;
+  const { userId, ingredients, nutrients, weight, type, nutrientRatioConstraints = [], configuration } = data;
   console.log("RAW NUTRIENTS FROM REQUEST:", JSON.stringify(nutrients, null, 2));
  
   const rawType = type || '';
@@ -1196,7 +1196,7 @@ const simplex = async (req, res) => {
 
   const { type, nutrients, userId } = req.body;
   
-  const { objectives, constraints, variableBounds, dmTarget, dmNutrientId, isPercentMode, ingredientsData } = await formatInput(req.body);
+  const { objectives, constraints, variableBounds, dmTarget, dmNutrientId, isPercentMode, ingredientsData, configuration } = await formatInput(req.body);
 
   try {
     const glpk = GLPK();
@@ -1253,11 +1253,12 @@ for (let i = 0; i < constraints.length; i++) {
       bounds: varsSubjects
     }, options);
 
+    
     console.log(`Solver status: ${output.result.status} (optimal is ${glpk.GLP_OPT})`);
 
-    const isSuccessful = (output.result.status === glpk.GLP_OPT);
+    let isSuccessful = (output.result.status === glpk.GLP_OPT);
 
-
+    if (configuration === "soft") isSuccessful = true;
     // ========================= POST-SOLVE ANALYSIS =========================
     if (isSuccessful) {
       console.log("✅ Optimal solution found!");

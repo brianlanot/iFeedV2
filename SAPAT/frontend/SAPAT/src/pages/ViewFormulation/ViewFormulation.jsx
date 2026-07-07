@@ -484,7 +484,9 @@ function ViewFormulation({
         nutrients,
         weight: weightinGrams,
         nutrientRatioConstraints,
-        type: ispercentcompute ? 'percent' : 'absolute'
+        type: ispercentcompute ? 'percent' : 'absolute',
+        configuration:  type === 'simplex-soft-constraint' ? 'soft' : 'hard'
+        
       })
       const optimizedCost = res.data.optimizedCost
       const optimizedIngredients = res.data.optimizedIngredients
@@ -1359,6 +1361,7 @@ function ViewFormulation({
             </div>
             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[100] w-52 p-2 shadow-xl border border-base-200 mt-2">
               <li><button className="py-2.5 text-xs" onClick={() => handleOptimize('simplex-dry-matter')}>{t('Simplex Hard Constraint')}</button></li>
+              <li><button className="py-2.5 text-xs" onClick={() => handleOptimize('simplex-soft-constraint')}>{t('Simplex Soft Constraint')}</button></li>
             </ul>
           </div>
           )}
