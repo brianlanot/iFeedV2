@@ -1144,7 +1144,8 @@ const formatInput = async (data) => {
     dmTarget,
     dmNutrientId,
     isPercentMode,
-    ingredientsData 
+    ingredientsData,
+    configuration
   };
 }
 
